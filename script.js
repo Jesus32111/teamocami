@@ -261,8 +261,8 @@ class InfiniteImageBackground {
   }
 
   preloadImages() {
-    for (let i = 1; i <= 12; i++) {
-      this.imageUrls.push(`img/Cami(${i}).jpg`);
+    for (let i = 1; i <= 11; i++) {
+      this.imageUrls.push(`img/Cami (${i}).jpg`);
     }
     this.imageUrls.forEach(url => {
       const img = new Image();
