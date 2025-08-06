@@ -390,27 +390,22 @@ class InfiniteImageBackground {
     img.style.width = `${size}px`;
     img.style.height = 'auto';
 
-    // Add shine effect with a certain probability
-    if (Math.random() < 0.2) { // 20% chance of having a shine
-      const shine = document.createElement('div');
-      const shines = [
-        { color: 'white', id: 1 },
-        { color: 'blue', id: 2 },
-        { color: 'green', id: 3 },
-        { color: 'yellow', id: 4 },
-        { color: 'red', id: 5 }
-      ];
-      const randomShine = shines[Math.floor(Math.random() * shines.length)];
-      
-      shine.className = `shine shine-${randomShine.color}`;
-      shine.dataset.shineId = randomShine.id;
-      
-      shine.addEventListener('click', (e) => {
+    // Add glow effect with a certain probability
+    if (Math.random() < 0.2) { // 20% chance of having a glow
+      img.classList.add('glowing-image');
+
+      // Add "CLICKEAME" text
+      const clickMeText = document.createElement('div');
+      clickMeText.className = 'click-me-text';
+      clickMeText.textContent = 'CLICKEAME';
+      imageContainer.appendChild(clickMeText);
+
+      // Add click listener to the image to show the modal
+      img.addEventListener('click', (e) => {
         e.stopPropagation();
-        this.showModal(img.src, randomShine.id);
+        // The shineId is not available anymore, so I'll pass a default value, for example 1
+        this.showModal(img.src, 1);
       });
-      
-      imageContainer.appendChild(shine);
     }
 
     imageContainer.appendChild(img);
