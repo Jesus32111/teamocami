@@ -1,3 +1,42 @@
+let audioPlayer;
+
+function playMusic(musicSrc) {
+    if (!audioPlayer) {
+        audioPlayer = document.getElementById('audio-player');
+    }
+
+    if (audioPlayer.src.endsWith(musicSrc) && !audioPlayer.paused) {
+        return; // No hacer nada si la misma canción ya se está reproduciendo
+    }
+    
+    audioPlayer.src = musicSrc;
+    audioPlayer.play().catch(error => console.error("Error al reproducir audio:", error));
+}
+
+let notificationTimeout;
+function showNotification(message) {
+    const notification = document.getElementById('notification');
+    if (!notification) return;
+
+    // Si hay una notificación anterior, la limpiamos para reiniciar la animación
+    if (notificationTimeout) {
+        clearTimeout(notificationTimeout);
+    }
+
+    notification.textContent = message;
+    notification.classList.remove('hidden');
+    notification.classList.add('show');
+
+    // Ocultar la notificación después de 3 segundos
+    notificationTimeout = setTimeout(() => {
+        notification.classList.remove('show');
+        // Opcional: añadir un pequeño retraso antes de ocultarla para que la animación de salida se complete
+        setTimeout(() => {
+            notification.classList.add('hidden');
+        }, 500); // 0.5s para la transición de 'top'
+    }, 3000);
+}
+
 class InfiniteTeAmo {
   constructor() {
     this.container = document.getElementById('words-container');
@@ -96,7 +135,10 @@ class InfiniteTeAmo {
     for (let i = 0; i < count && this.words.length > 0; i++) {
       const oldWord = this.words.shift();
       if (oldWord && oldWord.parentNode) {
-        oldWord.remove();
+        oldWord.classList.add('fade-out');
+        setTimeout(() => {
+          oldWord.remove();
+        }, 1000); // Coincide con la duración de la animación CSS
       }
     }
   }
@@ -264,8 +306,11 @@ class InfiniteTeAmo {
       if (word.life <= 0 || 
           newX < -200 || newX > window.innerWidth + 200 ||
           newY < -200 || newY > window.innerHeight + 200) {
-        word.remove();
+        word.classList.add('fade-out');
         this.words.splice(i, 1);
+        setTimeout(() => {
+            word.remove();
+        }, 1000); // Coincide con la duración de la animación CSS
       }
     }
     this.handleWordCollisions();
@@ -396,11 +441,11 @@ class InfiniteImageBackground {
 
       // Define glow styles
       const glowStyles = {
-        'white': { class: 'glow-white', message: '🤩 Eres el amor de mi vida, todo lo que siempre he buscado, mi ideal...🤩 ' },
-        'yellow': { class: 'glow-yellow', message: '❤️ Te amo más de lo que te puedas imaginar mi Cami hermosa❤️ ' },
-        'red': { class: 'glow-red', message: '⭐ Desde que llegaste a mi vida, todo tiene más sentido. No se trata solo de lo que haces por mí, sino de cómo me haces sentir: en paz, feliz y completamente yo. Gracias por existir y por enseñarme lo que es el amor de verdad ⭐' },
-        'green': { class: 'glow-green', message: 'Contigo entendí que el amor no se busca, se encuentra… y yo te encontré a ti. Eres mi lugar favorito 💏' },
-        'blue': { class: 'glow-blue', message: 'No sé qué hice para merecerte, pero no pienso dejar de cuidarte nunca. Eres lo mejor que me ha pasado. 💖' }
+        'white': { class: 'glow-white', message: '🤩 Eres el amor de mi vida, todo lo que siempre he buscado, mi ideal...🤩 ', music: 'mp3/music1.mp3', songName: 'Enamorado Tuyo - Cuarteto de Nos' },
+        'yellow': { class: 'glow-yellow', message: '❤️ Te amo más de lo que te puedas imaginar mi Cami hermosa❤️ ', music: 'mp3/music2.mp3', songName: 'Enchanted - Taylor Swift' },
+        'red': { class: 'glow-red', message: '⭐ Desde que llegaste a mi vida, todo tiene más sentido. No se trata solo de lo que haces por mí, sino de cómo me haces sentir: en paz, feliz y completamente yo. Gracias por existir y por enseñarme lo que es el amor de verdad ⭐', music: 'mp3/music3.mp3', songName: 'Can´t take my eyes of you - Morten Harket' },
+        'green': { class: 'glow-green', message: 'Contigo entendí que el amor no se busca, se encuentra… y yo te encontré a ti. Eres mi lugar favorito 💏', music: 'mp3/music4.mp3', songName: 'Only - Lee Hi' },
+        'blue': { class: 'glow-blue', message: 'No sé qué hice para merecerte, pero no pienso dejar de cuidarte nunca. Eres lo mejor que me ha pasado. 💖', music: 'mp3/music5.mp3', songName: 'Preso - Jose Jose' }
       };
       const glowKeys = Object.keys(glowStyles);
       const randomGlowKey = glowKeys[Math.floor(Math.random() * glowKeys.length)];
@@ -418,7 +463,7 @@ class InfiniteImageBackground {
       // Add click listener to the image to show the modal
       img.addEventListener('click', (e) => {
         e.stopPropagation();
-        this.showModal(img.src, selectedGlow.message);
+        this.showModal(img.src, selectedGlow.message, selectedGlow.music, selectedGlow.songName);
       });
     }
 
@@ -490,8 +535,11 @@ class InfiniteImageBackground {
       if (img.life <= 0 || 
           newX < -400 || newX > window.innerWidth + 400 ||
           newY < -400 || newY > window.innerHeight + 400) {
-        img.remove();
+        img.classList.add('fade-out');
         this.images.splice(i, 1);
+        setTimeout(() => {
+            img.remove();
+        }, 1000); // Coincide con la duración de la animación CSS
       }
     }
     this.handleCollisions();
@@ -531,18 +579,38 @@ class InfiniteImageBackground {
     }
   }
 
-  showModal(imageSrc, message) {
+  showModal(imageSrc, message, musicSrc, songName) {
     const modalOverlay = document.getElementById('modal-overlay');
     const modalImage = document.getElementById('modal-image');
     const modalMessage = document.getElementById('modal-message');
     const flipCard = document.getElementById('flip-card');
+    const flipCardBack = document.getElementById('flip-card-back');
 
     modalImage.src = imageSrc;
     modalMessage.textContent = message;
+
+    // Limpiar ícono de reproducción anterior si existe
+    const existingPlayIcon = flipCardBack.querySelector('.play-icon');
+    if (existingPlayIcon) {
+        existingPlayIcon.remove();
+    }
+
+    // Crear y agregar el ícono de reproducción
+    const playIcon = document.createElement('div');
+    playIcon.className = 'play-icon';
+    playIcon.textContent = '▶';
+    
+    playIcon.addEventListener('click', (e) => {
+        e.stopPropagation(); // Evitar que la tarjeta se voltee
+        playMusic(musicSrc);
+        showNotification(`Ahora suena: ${songName}`);
+    });
+
+    flipCardBack.appendChild(playIcon);
     
     modalOverlay.classList.remove('hidden');
     
-    // Reset flip card state
+    // Restablecer el estado de la tarjeta flip
     flipCard.classList.remove('flipped');
   }
 }
@@ -637,6 +705,7 @@ class InfiniteHearts {
 
 // Inicializar cuando la página esté cargada
 document.addEventListener('DOMContentLoaded', () => {
+  audioPlayer = document.getElementById('audio-player');
   teAmoInstance = new InfiniteTeAmo();
   imageBackgroundInstance = new InfiniteImageBackground();
   heartsInstance = new InfiniteHearts();
