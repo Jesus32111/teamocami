@@ -29,7 +29,7 @@ class InfiniteTeAmo {
 
   createWord() {
     const word = document.createElement('div');
-    word.className = 'word';
+    word.className = 'word fade-in';
     word.textContent = 'Te amo';
     
     // Tamaño aleatorio
@@ -37,8 +37,35 @@ class InfiniteTeAmo {
     word.style.fontSize = `${fontSize}px`;
     
     // Posición aleatoria inicial
-    const startX = Math.random() * (window.innerWidth + 400) - 200;
-    const startY = Math.random() * (window.innerHeight + 400) - 200;
+    let startX, startY, isOverlapping;
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    do {
+      startX = Math.random() * (window.innerWidth + 400) - 200;
+      startY = Math.random() * (window.innerHeight + 400) - 200;
+      isOverlapping = false;
+
+      const margin = 20;
+      const newRect = {
+        left: startX - margin,
+        right: startX + (fontSize * 4) + margin, // Approximate width
+        top: startY - margin,
+        bottom: startY + fontSize + margin
+      };
+
+      for (const existingWord of this.words) {
+        const existingRect = existingWord.getBoundingClientRect();
+        if (newRect.left < existingRect.right &&
+            newRect.right > existingRect.left &&
+            newRect.top < existingRect.bottom &&
+            newRect.bottom > existingRect.top) {
+          isOverlapping = true;
+          break;
+        }
+      }
+      attempts++;
+    } while (isOverlapping && attempts < maxAttempts);
     
     word.style.left = `${startX}px`;
     word.style.top = `${startY}px`;
@@ -81,11 +108,13 @@ class InfiniteTeAmo {
       this.removeOldestWords(wordsToRemove);
     }
     
-    // Agregar nuevas palabras en la posición especificada
+    // Agregar nuevas palabras en la posición especificada con un retraso
     for (let i = 0; i < count; i++) {
-      const word = this.createWord();
-      word.style.left = `${x + (Math.random() - 0.5) * 100}px`;
-      word.style.top = `${y + (Math.random() - 0.5) * 100}px`;
+      setTimeout(() => {
+        const word = this.createWord();
+        word.style.left = `${x + (Math.random() - 0.5) * 100}px`;
+        word.style.top = `${y + (Math.random() - 0.5) * 100}px`;
+      }, i * 50);
     }
   }
 
@@ -189,7 +218,7 @@ class InfiniteTeAmo {
     this.velocityY *= 0.95;
   }
 
-  updateWords() {
+  updateWords(imageBackground) {
     // Actualizar palabras existentes
     for (let i = this.words.length - 1; i >= 0; i--) {
       const word = this.words[i];
@@ -207,9 +236,27 @@ class InfiniteTeAmo {
       // Actualizar vida
       word.life -= 16; // ~60fps
       
-      // Efecto de desvanecimiento
-      const opacity = Math.min(0.8, word.life / word.maxLife);
-      word.style.opacity = opacity;
+      // Check for collision with images
+      let isCollidingWithImage = false;
+      if (imageBackground) {
+        const wordRect = word.getBoundingClientRect();
+        for (const img of imageBackground.images) {
+          const imgRect = img.getBoundingClientRect();
+          if (wordRect.left < imgRect.right &&
+              wordRect.right > imgRect.left &&
+              wordRect.top < imgRect.bottom &&
+              wordRect.bottom > imgRect.top) {
+            isCollidingWithImage = true;
+            break;
+          }
+        }
+      }
+
+      if (isCollidingWithImage) {
+        word.style.opacity = 0.5;
+      } else {
+        word.style.opacity = 1;
+      }
       
       // Remover palabras que han salido de la pantalla o han expirado
       if (word.life <= 0 || 
@@ -219,6 +266,7 @@ class InfiniteTeAmo {
         this.words.splice(i, 1);
       }
     }
+    this.handleWordCollisions();
   }
 
   generateNewWords() {
@@ -236,13 +284,43 @@ class InfiniteTeAmo {
   startAnimation() {
     const animate = () => {
       this.updateCamera();
-      this.updateWords();
+      this.updateWords(imageBackgroundInstance);
       this.generateNewWords();
+
+      if (imageBackgroundInstance) {
+        imageBackgroundInstance.updateImages(this.velocityX, this.velocityY);
+        imageBackgroundInstance.generateNewImages();
+      }
       
       requestAnimationFrame(animate);
     };
     
     animate();
+  }
+
+  handleWordCollisions() {
+    for (let i = 0; i < this.words.length; i++) {
+      for (let j = i + 1; j < this.words.length; j++) {
+        const word1 = this.words[i];
+        const word2 = this.words[j];
+
+        const rect1 = word1.getBoundingClientRect();
+        const rect2 = word2.getBoundingClientRect();
+
+        if (rect1.left < rect2.right &&
+            rect1.right > rect2.left &&
+            rect1.top < rect2.bottom &&
+            rect1.bottom > rect2.top) {
+          // Collision detected
+          const tempVx = word1.velocityX;
+          const tempVy = word1.velocityY;
+          word1.velocityX = word2.velocityX;
+          word1.velocityY = word2.velocityY;
+          word2.velocityX = tempVx;
+          word2.velocityY = tempVy;
+        }
+      }
+    }
   }
 }
 
@@ -251,13 +329,14 @@ class InfiniteImageBackground {
     this.container = document.getElementById('background-images-container');
     this.images = [];
     this.imageUrls = [];
-    this.maxImages = 4;
+    this.maxImages = 10;
+    this.recentlyUsedImages = [];
     this.init();
   }
 
   init() {
     this.preloadImages();
-    this.start();
+    this.createInitialImages();
   }
 
   preloadImages() {
@@ -270,44 +349,142 @@ class InfiniteImageBackground {
     });
   }
 
+  createInitialImages() {
+    for (let i = 0; i < 5; i++) {
+      this.createImage();
+    }
+  }
+
   createImage() {
+    let availableImages = this.imageUrls.filter(url => !this.recentlyUsedImages.includes(url));
+    if (availableImages.length === 0) {
+      this.recentlyUsedImages.shift();
+      availableImages = this.imageUrls.filter(url => !this.recentlyUsedImages.includes(url));
+    }
+
     const img = document.createElement('img');
-    img.className = 'background-image';
-    img.src = this.imageUrls[Math.floor(Math.random() * this.imageUrls.length)];
+    img.className = 'background-image fade-in';
+    const randomImageUrl = availableImages[Math.floor(Math.random() * availableImages.length)];
+    img.src = randomImageUrl;
     
-    const size = Math.random() * 150 + 50;
+    this.recentlyUsedImages.push(randomImageUrl);
+    if (this.recentlyUsedImages.length > 5) {
+      this.recentlyUsedImages.shift();
+    }
+    
+    const baseSize = 250;
+    const sizeFactors = [0.8, 1.0, 1.2];
+    const randomFactor = sizeFactors[Math.floor(Math.random() * sizeFactors.length)];
+    const size = baseSize * randomFactor;
+    
     img.style.width = `${size}px`;
     img.style.height = 'auto';
 
-    img.style.left = `${Math.random() * window.innerWidth}px`;
-    img.style.top = `${Math.random() * window.innerHeight}px`;
+    let startX, startY, isOverlapping;
+    let attempts = 0;
+    const maxAttempts = 10;
 
-    img.style.opacity = 0;
+    do {
+      startX = Math.random() * (window.innerWidth + 400) - 200;
+      startY = Math.random() * (window.innerHeight + 400) - 200;
+      isOverlapping = false;
+
+      const margin = 50;
+      const newRect = {
+        left: startX - margin,
+        right: startX + size + margin,
+        top: startY - margin,
+        bottom: startY + (size * (img.naturalHeight / img.naturalWidth) || size) + margin
+      };
+
+      for (const existingImage of this.images) {
+        const existingRect = existingImage.getBoundingClientRect();
+        if (newRect.left < existingRect.right &&
+            newRect.right > existingRect.left &&
+            newRect.top < existingRect.bottom &&
+            newRect.bottom > existingRect.top) {
+          isOverlapping = true;
+          break;
+        }
+      }
+      attempts++;
+    } while (isOverlapping && attempts < maxAttempts);
+    
+    img.style.left = `${startX}px`;
+    img.style.top = `${startY}px`;
+
+    const speed = Math.random() * 2 + 0.5;
+    const angle = Math.random() * Math.PI * 2;
+    
+    img.velocityX = Math.cos(angle) * speed;
+    img.velocityY = Math.sin(angle) * speed;
+    
+    img.life = Math.random() * 10000 + 8000;
+    img.maxLife = img.life;
     
     this.container.appendChild(img);
     this.images.push(img);
-
-    // Fade in
-    setTimeout(() => {
-      img.style.opacity = Math.random() * 0.3 + 0.1;
-    }, 100);
-
-    // Fade out and remove
-    setTimeout(() => {
-      img.style.opacity = 0;
-      setTimeout(() => {
-        img.remove();
-        this.images = this.images.filter(i => i !== img);
-      }, 2000);
-    }, 5000 + Math.random() * 5000);
+    
+    return img;
   }
 
-  start() {
-    setInterval(() => {
-      if (this.images.length < this.maxImages) {
-        this.createImage();
+  updateImages(cameraVelocityX, cameraVelocityY) {
+    for (let i = this.images.length - 1; i >= 0; i--) {
+      const img = this.images[i];
+      
+      const currentX = parseFloat(img.style.left);
+      const currentY = parseFloat(img.style.top);
+      
+      const newX = currentX + img.velocityX - cameraVelocityX;
+      const newY = currentY + img.velocityY - cameraVelocityY;
+      
+      img.style.left = `${newX}px`;
+      img.style.top = `${newY}px`;
+      
+      img.life -= 16;
+      
+      if (img.life <= 0 || 
+          newX < -400 || newX > window.innerWidth + 400 ||
+          newY < -400 || newY > window.innerHeight + 400) {
+        img.remove();
+        this.images.splice(i, 1);
       }
-    }, 2000);
+    }
+    this.handleCollisions();
+  }
+
+  generateNewImages() {
+    if (Math.random() < 0.3 && this.images.length < this.maxImages) {
+      this.createImage();
+    }
+    while (this.images.length < 5) {
+      this.createImage();
+    }
+  }
+
+  handleCollisions() {
+    for (let i = 0; i < this.images.length; i++) {
+      for (let j = i + 1; j < this.images.length; j++) {
+        const img1 = this.images[i];
+        const img2 = this.images[j];
+
+        const rect1 = img1.getBoundingClientRect();
+        const rect2 = img2.getBoundingClientRect();
+
+        if (rect1.left < rect2.right &&
+            rect1.right > rect2.left &&
+            rect1.top < rect2.bottom &&
+            rect1.bottom > rect2.top) {
+          // Collision detected
+          const tempVx = img1.velocityX;
+          const tempVy = img1.velocityY;
+          img1.velocityX = img2.velocityX;
+          img1.velocityY = img2.velocityY;
+          img2.velocityX = tempVx;
+          img2.velocityY = tempVy;
+        }
+      }
+    }
   }
 }
 
