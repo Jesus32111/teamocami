@@ -362,6 +362,10 @@ class InfiniteImageBackground {
   }
 
   createImage() {
+    // Create a container for the image and shine effect
+    const imageContainer = document.createElement('div');
+    imageContainer.className = 'image-container';
+
     let availableImages = this.imageUrls.filter(url => !this.recentlyUsedImages.includes(url));
     if (availableImages.length === 0) {
       this.recentlyUsedImages.shift();
@@ -385,6 +389,31 @@ class InfiniteImageBackground {
     
     img.style.width = `${size}px`;
     img.style.height = 'auto';
+
+    // Add shine effect with a certain probability
+    if (Math.random() < 0.2) { // 20% chance of having a shine
+      const shine = document.createElement('div');
+      const shines = [
+        { color: 'white', id: 1 },
+        { color: 'blue', id: 2 },
+        { color: 'green', id: 3 },
+        { color: 'yellow', id: 4 },
+        { color: 'red', id: 5 }
+      ];
+      const randomShine = shines[Math.floor(Math.random() * shines.length)];
+      
+      shine.className = `shine shine-${randomShine.color}`;
+      shine.dataset.shineId = randomShine.id;
+      
+      shine.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.showModal(img.src, randomShine.id);
+      });
+      
+      imageContainer.appendChild(shine);
+    }
+
+    imageContainer.appendChild(img);
 
     let startX, startY, isOverlapping;
     let attempts = 0;
@@ -416,22 +445,22 @@ class InfiniteImageBackground {
       attempts++;
     } while (isOverlapping && attempts < maxAttempts);
     
-    img.style.left = `${startX}px`;
-    img.style.top = `${startY}px`;
+    imageContainer.style.left = `${startX}px`;
+    imageContainer.style.top = `${startY}px`;
 
     const speed = Math.random() * 2 + 0.5;
     const angle = Math.random() * Math.PI * 2;
     
-    img.velocityX = Math.cos(angle) * speed;
-    img.velocityY = Math.sin(angle) * speed;
+    imageContainer.velocityX = Math.cos(angle) * speed;
+    imageContainer.velocityY = Math.sin(angle) * speed;
     
-    img.life = Math.random() * 10000 + 8000;
-    img.maxLife = img.life;
+    imageContainer.life = Math.random() * 10000 + 8000;
+    imageContainer.maxLife = imageContainer.life;
     
-    this.container.appendChild(img);
-    this.images.push(img);
+    this.container.appendChild(imageContainer);
+    this.images.push(imageContainer);
     
-    return img;
+    return imageContainer;
   }
 
   updateImages(cameraVelocityX, cameraVelocityY) {
@@ -491,6 +520,21 @@ class InfiniteImageBackground {
         }
       }
     }
+  }
+
+  showModal(imageSrc, shineId) {
+    const modalOverlay = document.getElementById('modal-overlay');
+    const modalImage = document.getElementById('modal-image');
+    const modalMessage = document.getElementById('modal-message');
+    const flipCard = document.getElementById('flip-card');
+
+    modalImage.src = imageSrc;
+    modalMessage.textContent = `te amo camila${shineId > 1 ? shineId : ''}`;
+    
+    modalOverlay.classList.remove('hidden');
+    
+    // Reset flip card state
+    flipCard.classList.remove('flipped');
   }
 }
 
@@ -587,6 +631,23 @@ document.addEventListener('DOMContentLoaded', () => {
   teAmoInstance = new InfiniteTeAmo();
   imageBackgroundInstance = new InfiniteImageBackground();
   heartsInstance = new InfiniteHearts();
+
+  const modalOverlay = document.getElementById('modal-overlay');
+  const flipCard = document.getElementById('flip-card');
+
+  function closeModal() {
+    modalOverlay.classList.add('hidden');
+  }
+
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) {
+      closeModal();
+    }
+  });
+
+  flipCard.addEventListener('click', () => {
+    flipCard.classList.toggle('flipped');
+  });
 });
 
 // Agregar palabras al hacer clic con control de límite
