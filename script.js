@@ -1,3 +1,16 @@
+// Enhanced Loading Screen
+function hideLoadingScreen() {
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+        setTimeout(() => {
+            loadingScreen.classList.add('hidden');
+            setTimeout(() => {
+                loadingScreen.remove();
+            }, 500);
+        }, 1500); // Show loading for 1.5 seconds
+    }
+}
+
 let audioPlayer;
 
 function playMusic(musicSrc) {
@@ -16,6 +29,7 @@ function playMusic(musicSrc) {
 let notificationTimeout;
 function showNotification(message) {
     const notification = document.getElementById('notification');
+    const notificationText = notification.querySelector('.notification-text');
     if (!notification) return;
 
     // Si hay una notificación anterior, la limpiamos para reiniciar la animación
@@ -23,7 +37,11 @@ function showNotification(message) {
         clearTimeout(notificationTimeout);
     }
 
-    notification.textContent = message;
+    if (notificationText) {
+        notificationText.textContent = message;
+    } else {
+        notification.textContent = message;
+    }
     notification.classList.remove('hidden');
     notification.classList.add('show');
 
@@ -737,6 +755,9 @@ class InfiniteHearts {
 
 // Inicializar cuando la página esté cargada
 document.addEventListener('DOMContentLoaded', () => {
+  // Hide loading screen
+  hideLoadingScreen();
+  
   audioPlayer = document.getElementById('audio-player');
   teAmoInstance = new InfiniteTeAmo();
   imageBackgroundInstance = new InfiniteImageBackground();
@@ -758,6 +779,33 @@ document.addEventListener('DOMContentLoaded', () => {
   flipCard.addEventListener('click', () => {
     flipCard.classList.toggle('flipped');
   });
+
+  // Enhanced FAB functionality
+  const fab = document.getElementById('fab');
+  if (fab) {
+    fab.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Create a burst of hearts and words at random positions
+      for (let i = 0; i < 3; i++) {
+        const x = Math.random() * window.innerWidth;
+        const y = Math.random() * window.innerHeight;
+        if (heartsInstance) {
+          heartsInstance.addHeartsAtPosition(x, y, 3);
+        }
+        if (teAmoInstance) {
+          teAmoInstance.addWordsAtPosition(x, y, 2);
+        }
+      }
+      
+      // Add visual feedback
+      fab.style.transform = 'scale(0.9) rotate(180deg)';
+      setTimeout(() => {
+        fab.style.transform = '';
+      }, 200);
+      
+      showNotification('💕 ¡Más amor generado! 💕');
+    });
+  }
 });
 
 // Agregar palabras al hacer clic con control de límite

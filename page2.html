@@ -1,42 +1,299 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
-    <title>Configuración - Te Amo</title>
+    <title>Configuración - Te Amo ❤️</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Configuración y controles del espacio infinito de amor" />
+    <meta name="theme-color" content="#ff6b9d" />
+    
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
     <link rel="stylesheet" href="styles.css" />
+    <style>
+      .config-page {
+        background: var(--gradient-aurora);
+        color: #fff;
+        padding: 0;
+        min-height: 100vh;
+        font-family: var(--font-primary);
+      }
+      
+      .config-nav {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        padding: var(--space-lg) var(--space-xl);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .config-nav a {
+        color: #fff;
+        text-decoration: none;
+        font-weight: 500;
+        padding: var(--space-sm) var(--space-lg);
+        border-radius: var(--radius-full);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all var(--transition-base);
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+      }
+      
+      .config-nav a:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
+      
+      .config-nav a[aria-current="page"] {
+        background: var(--gradient-romantic);
+        border-color: transparent;
+      }
+      
+      .config-main {
+        text-align: center;
+        padding: var(--space-2xl);
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      
+      .config-title {
+        font-family: var(--font-display);
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--primary-pink);
+        text-shadow: 0 0 30px rgba(255, 107, 157, 0.5);
+        margin-bottom: var(--space-lg);
+        animation: titleGlow 3s ease-in-out infinite;
+      }
+      
+      @keyframes titleGlow {
+        0%, 100% { text-shadow: 0 0 30px rgba(255, 107, 157, 0.5); }
+        50% { text-shadow: 0 0 50px rgba(255, 107, 157, 0.8); }
+      }
+      
+      .config-subtitle {
+        font-size: 1.25rem;
+        margin-bottom: var(--space-2xl);
+        opacity: 0.9;
+      }
+      
+      .config-section {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: var(--radius-xl);
+        padding: var(--space-2xl);
+        margin-bottom: var(--space-xl);
+        text-align: left;
+      }
+      
+      .config-section h2 {
+        font-family: var(--font-display);
+        color: var(--accent-pink);
+        margin-bottom: var(--space-lg);
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+      }
+      
+      .config-section ul {
+        list-style: none;
+        padding: 0;
+      }
+      
+      .config-section li {
+        padding: var(--space-md) 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-md);
+      }
+      
+      .config-section li:last-child {
+        border-bottom: none;
+      }
+      
+      .config-icon {
+        font-size: 1.5rem;
+        min-width: 2rem;
+      }
+      
+      .config-content {
+        flex: 1;
+      }
+      
+      .config-content strong {
+        color: var(--accent-pink);
+        font-weight: 600;
+      }
+      
+      .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-sm);
+        margin-top: var(--space-2xl);
+        padding: var(--space-lg) var(--space-2xl);
+        background: var(--gradient-romantic);
+        color: white;
+        text-decoration: none;
+        border-radius: var(--radius-full);
+        font-weight: 600;
+        font-size: 1.1rem;
+        box-shadow: var(--shadow-lg);
+        transition: all var(--transition-base);
+      }
+      
+      .back-button:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-xl);
+      }
+      
+      .back-button:active {
+        transform: translateY(-1px);
+      }
+      
+      @media (max-width: 768px) {
+        .config-nav {
+          padding: var(--space-md);
+          flex-direction: column;
+          gap: var(--space-md);
+        }
+        
+        .config-main {
+          padding: var(--space-lg);
+        }
+        
+        .config-title {
+          font-size: 2rem;
+        }
+        
+        .config-section {
+          padding: var(--space-lg);
+        }
+        
+        .config-section li {
+          flex-direction: column;
+          gap: var(--space-sm);
+        }
+        
+        .config-icon {
+          align-self: flex-start;
+        }
+      }
+    </style>
   </head>
-  <body style="background: #1a1a2e; color: #fff; padding: 2rem;">
-    <nav style="background: rgba(255, 105, 180, 0.1); border: 1px solid #ff69b4;">
-      <a href="/" style="color: #ff69b4;">Cascada Te Amo</a>
-      <a href="/page2.html" aria-current="page" style="color: #fff; background: #ff69b4;">Configuración</a>
+  <body class="config-page">
+    <nav class="config-nav">
+      <a href="/">
+        <span>❤️</span>
+        <span>Cascada Te Amo</span>
+      </a>
+      <a href="/page2.html" aria-current="page">
+        <span>⚙️</span>
+        <span>Configuración</span>
+      </a>
     </nav>
-    <main style="text-align: center; padding: 2rem;">
-      <h1 style="color: #ff69b4; text-shadow: 0 0 20px #ff69b4;">Configuración del Espacio Infinito</h1>
-      <p style="margin: 2rem 0; font-size: 1.2rem;">
+    
+    <main class="config-main">
+      <h1 class="config-title">Configuración del Espacio Infinito</h1>
+      <p class="config-subtitle">
         Personaliza tu experiencia en el espacio infinito de amor
       </p>
       
-      <div style="max-width: 600px; margin: 0 auto; text-align: left;">
-        <h2 style="color: #ff6b9d; margin: 2rem 0 1rem;">Controles:</h2>
-        <ul style="line-height: 2;">
-          <li><strong>Flechas del teclado:</strong> Muévete por el espacio</li>
-          <li><strong>Mouse/Dedo:</strong> Arrastra para navegar</li>
-          <li><strong>Rueda del mouse:</strong> Movimiento adicional</li>
-          <li><strong>Clic:</strong> Genera más palabras "Te amo"</li>
+      <div class="config-section">
+        <h2>
+          <span>🎮</span>
+          Controles
+        </h2>
+        <ul>
+          <li>
+            <span class="config-icon">⌨️</span>
+            <div class="config-content">
+              <strong>Flechas del teclado:</strong> Muévete por el espacio infinito
+            </div>
+          </li>
+          <li>
+            <span class="config-icon">🖱️</span>
+            <div class="config-content">
+              <strong>Mouse/Dedo:</strong> Arrastra para navegar suavemente
+            </div>
+          </li>
+          <li>
+            <span class="config-icon">🔄</span>
+            <div class="config-content">
+              <strong>Rueda del mouse:</strong> Movimiento adicional y zoom
+            </div>
+          </li>
+          <li>
+            <span class="config-icon">👆</span>
+            <div class="config-content">
+              <strong>Clic/Toque:</strong> Genera corazones en esa posición
+            </div>
+          </li>
+          <li>
+            <span class="config-icon">💕</span>
+            <div class="config-content">
+              <strong>Botón flotante:</strong> Genera múltiples elementos de amor
+            </div>
+          </li>
         </ul>
-        
-        <h2 style="color: #ff6b9d; margin: 2rem 0 1rem;">Características:</h2>
-        <ul style="line-height: 2;">
-          <li>Generación infinita de palabras</li>
-          <li>Movimiento fluido en todas las direcciones</li>
-          <li>Efectos de luz y partículas</li>
-          <li>Colores románticos y animaciones suaves</li>
-          <li>Responsive para móviles y escritorio</li>
+      </div>
+
+      <div class="config-section">
+        <h2>
+          <span>✨</span>
+          Características
+        </h2>
+        <ul>
+          <li>
+            <span class="config-icon">♾️</span>
+            <div class="config-content">
+              <strong>Generación infinita:</strong> Palabras y elementos que aparecen constantemente
+            </div>
+          </li>
+          <li>
+            <span class="config-icon">🌊</span>
+            <div class="config-content">
+              <strong>Movimiento fluido:</strong> Navegación suave en todas las direcciones
+            </div>
+          </li>
+          <li>
+            <span class="config-icon">💫</span>
+            <div class="config-content">
+              <strong>Efectos visuales:</strong> Brillos, partículas y animaciones románticas
+            </div>
+          </li>
+          <li>
+            <span class="config-icon">🎨</span>
+            <div class="config-content">
+              <strong>Colores mágicos:</strong> 5 colores especiales con mensajes únicos
+            </div>
+          </li>
+          <li>
+            <span class="config-icon">📱</span>
+            <div class="config-content">
+              <strong>Responsive:</strong> Optimizado para móviles, tablets y escritorio
+            </div>
+          </li>
+          <li>
+            <span class="config-icon">🎵</span>
+            <div class="config-content">
+              <strong>Música romántica:</strong> Canciones especiales al encontrar colores
+            </div>
+          </li>
         </ul>
       </div>
       
-      <a href="/" style="display: inline-block; margin-top: 3rem; padding: 1rem 2rem; background: linear-gradient(45deg, #ff69b4, #ff1493); color: white; text-decoration: none; border-radius: 25px; font-weight: bold; text-shadow: none; box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);">
+      <a href="/" class="back-button">
+        <span>🚀</span>
         Volver al Espacio Infinito
       </a>
     </main>
