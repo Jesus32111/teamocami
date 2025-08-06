@@ -48,7 +48,8 @@ class InfiniteTeAmo {
     this.isDragging = false;
     this.lastMouseX = 0;
     this.lastMouseY = 0;
-    this.maxWords = 26; // Límite máximo de palabras
+    const isMobile = window.innerWidth <= 768;
+    this.maxWords = isMobile ? 10 : 26; // Límite máximo de palabras
     
     this.init();
   }
@@ -72,7 +73,9 @@ class InfiniteTeAmo {
     word.textContent = 'Te amo';
     
     // Tamaño aleatorio
-    const fontSize = Math.random() * 30 + 20;
+    const isMobile = window.innerWidth <= 768;
+    const fontSizeMultiplier = isMobile ? 0.7 : 1;
+    const fontSize = (Math.random() * 30 + 20) * fontSizeMultiplier;
     word.style.fontSize = `${fontSize}px`;
     
     // Posición aleatoria inicial
@@ -81,8 +84,14 @@ class InfiniteTeAmo {
     const maxAttempts = 10;
 
     do {
-      startX = Math.random() * (window.innerWidth + 400) - 200;
-      startY = Math.random() * (window.innerHeight + 400) - 200;
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile) {
+        startX = Math.random() * (window.innerWidth + 200) - 100;
+        startY = Math.random() * (window.innerHeight + 200) - 100;
+      } else {
+        startX = Math.random() * (window.innerWidth + 400) - 200;
+        startY = Math.random() * (window.innerHeight + 400) - 200;
+      }
       isOverlapping = false;
 
       const margin = 20;
@@ -205,8 +214,8 @@ class InfiniteTeAmo {
         const deltaX = e.clientX - this.lastMouseX;
         const deltaY = e.clientY - this.lastMouseY;
         
-        this.velocityX += deltaX * 0.1;
-        this.velocityY += deltaY * 0.1;
+        this.velocityX += deltaX * 0.3;
+        this.velocityY += deltaY * 0.3;
         
         this.lastMouseX = e.clientX;
         this.lastMouseY = e.clientY;
@@ -230,13 +239,13 @@ class InfiniteTeAmo {
         const deltaX = e.touches[0].clientX - this.lastMouseX;
         const deltaY = e.touches[0].clientY - this.lastMouseY;
         
-        this.velocityX += deltaX * 0.1;
-        this.velocityY += deltaY * 0.1;
+        this.velocityX -= deltaX * 0.3;
+        this.velocityY -= deltaY * 0.3;
         
         this.lastMouseX = e.touches[0].clientX;
         this.lastMouseY = e.touches[0].clientY;
       }
-    });
+    }, { passive: false });
 
     document.addEventListener('touchend', () => {
       this.isDragging = false;
@@ -318,7 +327,9 @@ class InfiniteTeAmo {
 
   generateNewWords() {
     // Generar nuevas palabras con menos frecuencia
-    if (Math.random() < 0.5 && this.words.length < this.maxWords) { // 10% de probabilidad
+    const isMobile = window.innerWidth <= 768;
+    const generationChance = isMobile ? 0.2 : 0.5;
+    if (Math.random() < generationChance && this.words.length < this.maxWords) { // 10% de probabilidad
       this.createWord();
     }
     
@@ -380,7 +391,8 @@ class InfiniteImageBackground {
     this.container = document.getElementById('background-images-container');
     this.images = [];
     this.imageUrls = [];
-    this.maxImages = 10;
+    const isMobile = window.innerWidth <= 768;
+    this.maxImages = isMobile ? 3 : 10;
     this.recentlyUsedImages = [];
     this.init();
   }
@@ -427,7 +439,8 @@ class InfiniteImageBackground {
       this.recentlyUsedImages.shift();
     }
     
-    const baseSize = 250;
+    const isMobile = window.innerWidth <= 768;
+    const baseSize = isMobile ? 175 : 250; // 30% reduction for mobile
     const sizeFactors = [0.8, 1.0, 1.2];
     const randomFactor = sizeFactors[Math.floor(Math.random() * sizeFactors.length)];
     const size = baseSize * randomFactor;
@@ -474,8 +487,14 @@ class InfiniteImageBackground {
     const maxAttempts = 10;
 
     do {
-      startX = Math.random() * (window.innerWidth + 400) - 200;
-      startY = Math.random() * (window.innerHeight + 400) - 200;
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile) {
+        startX = Math.random() * (window.innerWidth + 200) - 100;
+        startY = Math.random() * (window.innerHeight + 200) - 100;
+      } else {
+        startX = Math.random() * (window.innerWidth + 400) - 200;
+        startY = Math.random() * (window.innerHeight + 400) - 200;
+      }
       isOverlapping = false;
 
       const margin = 50;
@@ -487,7 +506,15 @@ class InfiniteImageBackground {
       };
 
       for (const existingImage of this.images) {
-        const existingRect = existingImage.getBoundingClientRect();
+        const existingRect = {
+            left: parseFloat(existingImage.style.left),
+            top: parseFloat(existingImage.style.top),
+            width: existingImage.offsetWidth,
+            height: existingImage.offsetHeight
+        };
+        existingRect.right = existingRect.left + existingRect.width;
+        existingRect.bottom = existingRect.top + existingRect.height;
+
         if (newRect.left < existingRect.right &&
             newRect.right > existingRect.left &&
             newRect.top < existingRect.bottom &&
@@ -546,7 +573,9 @@ class InfiniteImageBackground {
   }
 
   generateNewImages() {
-    if (Math.random() < 0.3 && this.images.length < this.maxImages) {
+    const isMobile = window.innerWidth <= 768;
+    const generationChance = isMobile ? 0.1 : 0.3;
+    if (Math.random() < generationChance && this.images.length < this.maxImages) {
       this.createImage();
     }
     while (this.images.length < 5) {
@@ -624,7 +653,8 @@ class InfiniteHearts {
   constructor() {
     this.container = document.getElementById('words-container'); // Reuse the same container
     this.hearts = [];
-    this.maxHearts = 200;
+    const isMobile = window.innerWidth <= 768;
+    this.maxHearts = isMobile ? 100 : 200;
     this.init();
   }
 
@@ -637,7 +667,9 @@ class InfiniteHearts {
     heart.className = 'heart';
     heart.textContent = '❤️';
     
-    const size = Math.random() * 20 + 10;
+    const isMobile = window.innerWidth <= 768;
+    const sizeMultiplier = isMobile ? 0.7 : 1;
+    const size = (Math.random() * 20 + 10) * sizeMultiplier;
     heart.style.fontSize = `${size}px`;
     
     heart.style.left = `${x}px`;
