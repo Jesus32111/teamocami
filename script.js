@@ -246,12 +246,79 @@ class InfiniteTeAmo {
   }
 }
 
+class InfiniteImageBackground {
+  constructor() {
+    this.container = document.getElementById('background-images-container');
+    this.images = [];
+    this.imageUrls = [];
+    this.maxImages = 4;
+    this.init();
+  }
+
+  init() {
+    this.preloadImages();
+    this.start();
+  }
+
+  preloadImages() {
+    for (let i = 1; i <= 12; i++) {
+      this.imageUrls.push(`img/Cami(${i}).jpg`);
+    }
+    this.imageUrls.forEach(url => {
+      const img = new Image();
+      img.src = url;
+    });
+  }
+
+  createImage() {
+    const img = document.createElement('img');
+    img.className = 'background-image';
+    img.src = this.imageUrls[Math.floor(Math.random() * this.imageUrls.length)];
+    
+    const size = Math.random() * 150 + 50;
+    img.style.width = `${size}px`;
+    img.style.height = 'auto';
+
+    img.style.left = `${Math.random() * window.innerWidth}px`;
+    img.style.top = `${Math.random() * window.innerHeight}px`;
+
+    img.style.opacity = 0;
+    
+    this.container.appendChild(img);
+    this.images.push(img);
+
+    // Fade in
+    setTimeout(() => {
+      img.style.opacity = Math.random() * 0.3 + 0.1;
+    }, 100);
+
+    // Fade out and remove
+    setTimeout(() => {
+      img.style.opacity = 0;
+      setTimeout(() => {
+        img.remove();
+        this.images = this.images.filter(i => i !== img);
+      }, 2000);
+    }, 5000 + Math.random() * 5000);
+  }
+
+  start() {
+    setInterval(() => {
+      if (this.images.length < this.maxImages) {
+        this.createImage();
+      }
+    }, 2000);
+  }
+}
+
 // Variable global para la instancia
 let teAmoInstance;
+let imageBackgroundInstance;
 
 // Inicializar cuando la página esté cargada
 document.addEventListener('DOMContentLoaded', () => {
   teAmoInstance = new InfiniteTeAmo();
+  imageBackgroundInstance = new InfiniteImageBackground();
 });
 
 // Agregar palabras al hacer clic con control de límite
