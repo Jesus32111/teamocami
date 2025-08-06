@@ -1,18 +1,62 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
-    <title>Te Amo</title>
+    <title>Te Amo ❤️ - Espacio Infinito de Amor</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Una experiencia interactiva llena de amor y momentos especiales" />
+    <meta name="theme-color" content="#ff6b9d" />
+    
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
     <link rel="stylesheet" href="styles.css" />
     <script type="module" src="script.js"></script>
   </head>
   <body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+      <div class="loading-content">
+        <div class="loading-heart">❤️</div>
+        <h2>Cargando momentos especiales...</h2>
+        <div class="loading-bar">
+          <div class="loading-progress"></div>
+        </div>
+      </div>
+    </div>
+
     <div id="container">
+      <!-- Enhanced Navigation -->
+      <nav class="modern-nav">
+        <div class="nav-content">
+          <a href="/" class="nav-logo">
+            <span class="logo-heart">❤️</span>
+            <span class="logo-text">Te Amo</span>
+          </a>
+          <a href="/page2.html" class="nav-link">
+            <span class="nav-icon">⚙️</span>
+            <span>Configuración</span>
+          </a>
+        </div>
+      </nav>
+
       <div id="background-images-container"></div>
       <div id="words-container"></div>
+      
+      <!-- Enhanced Controls -->
       <div class="controls">
-        <p>Encuentra los 5 colores: Rojo, Verde, Azul, Amarillo y Blanco</p>
+        <div class="controls-content">
+          <p class="controls-title">🎯 Encuentra los 5 colores mágicos</p>
+          <div class="color-indicators">
+            <span class="color-dot red" title="Rojo"></span>
+            <span class="color-dot green" title="Verde"></span>
+            <span class="color-dot blue" title="Azul"></span>
+            <span class="color-dot yellow" title="Amarillo"></span>
+            <span class="color-dot white" title="Blanco"></span>
+          </div>
+          <p class="controls-hint">💡 Usa las flechas, mouse o toca para navegar</p>
+        </div>
       </div>
     </div>
 
@@ -30,6 +74,18 @@
     </div>
 
     <audio id="audio-player" src=""></audio>
-    <div id="notification" class="hidden"></div>
+    
+    <!-- Enhanced Notification -->
+    <div id="notification" class="hidden">
+      <div class="notification-content">
+        <span class="notification-icon">🎵</span>
+        <span class="notification-text"></span>
+      </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button id="fab" class="fab" title="Generar más amor">
+      <span class="fab-icon">💕</span>
+    </button>
   </body>
 </html>
