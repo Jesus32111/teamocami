@@ -20,7 +20,7 @@ body:active {
   position: relative;
   width: 100vw;
   height: 100vh;
-  background: #000;
+  background: #c7acc3;
 }
 
 #background-images-container {
@@ -131,7 +131,42 @@ body:active {
 
 .glowing-image {
   cursor: pointer;
-  filter: drop-shadow(0 0 15px #ff69b4) drop-shadow(0 0 25px #ff69b4) drop-shadow(0 0 40px #ff69b4);
+}
+
+/* Glow Styles */
+.glow-white .glowing-image {
+  filter: drop-shadow(0 0 15px #fff) drop-shadow(0 0 25px #fff) drop-shadow(0 0 40px #fff);
+}
+.glow-white .click-me-text {
+  text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff;
+}
+
+.glow-yellow .glowing-image {
+  filter: drop-shadow(0 0 15px #ff0) drop-shadow(0 0 25px #ff0) drop-shadow(0 0 40px #ff0);
+}
+.glow-yellow .click-me-text {
+  text-shadow: 0 0 5px #ff0, 0 0 10px #ff0, 0 0 15px #ff0;
+}
+
+.glow-red .glowing-image {
+  filter: drop-shadow(0 0 15px #f00) drop-shadow(0 0 25px #f00) drop-shadow(0 0 40px #f00);
+}
+.glow-red .click-me-text {
+  text-shadow: 0 0 5px #f00, 0 0 10px #f00, 0 0 15px #f00;
+}
+
+.glow-green .glowing-image {
+  filter: drop-shadow(0 0 15px #0f0) drop-shadow(0 0 25px #0f0) drop-shadow(0 0 40px #0f0);
+}
+.glow-green .click-me-text {
+  text-shadow: 0 0 5px #0f0, 0 0 10px #0f0, 0 0 15px #0f0;
+}
+
+.glow-blue .glowing-image {
+  filter: drop-shadow(0 0 15px #00f) drop-shadow(0 0 25px #00f) drop-shadow(0 0 40px #00f);
+}
+.glow-blue .click-me-text {
+  text-shadow: 0 0 5px #00f, 0 0 10px #00f, 0 0 15px #00f;
 }
 
 .click-me-text {
@@ -141,7 +176,6 @@ body:active {
   font-family: 'Comic Sans MS', cursive, sans-serif;
   font-size: 22px;
   font-weight: bold;
-  text-shadow: 0 0 5px #fff, 0 0 10px #ff69b4, 0 0 15px #ff69b4;
   animation: pulse-text 2s ease-in-out infinite;
   pointer-events: none; /* So it doesn't interfere with clicks on the image */
   z-index: 5;
@@ -213,8 +247,8 @@ body:active {
 }
 
 #flip-card-back {
-  background: #ff69b4;
-  color: white;
+  background: #ffffff;
+  color: rgb(0, 0, 0);
   transform: rotateY(180deg);
   font-size: 24px;
   text-align: center;

@@ -9,7 +9,7 @@ class InfiniteTeAmo {
     this.isDragging = false;
     this.lastMouseX = 0;
     this.lastMouseY = 0;
-    this.maxWords = 42; // Límite máximo de palabras
+    this.maxWords = 26; // Límite máximo de palabras
     
     this.init();
   }
@@ -22,7 +22,7 @@ class InfiniteTeAmo {
 
   createInitialWords() {
     // Crear menos palabras iniciales
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 25; i++) {
       this.createWord();
     }
   }
@@ -346,7 +346,7 @@ class InfiniteImageBackground {
   }
 
   preloadImages() {
-    for (let i = 1; i <= 11; i++) {
+    for (let i = 1; i <= 24; i++) {
       this.imageUrls.push(`img/Cami (${i}).jpg`);
     }
     this.imageUrls.forEach(url => {
@@ -394,6 +394,21 @@ class InfiniteImageBackground {
     if (Math.random() < 0.2) { // 20% chance of having a glow
       img.classList.add('glowing-image');
 
+      // Define glow styles
+      const glowStyles = {
+        'white': { class: 'glow-white', message: '🤩 Eres el amor de mi vida, todo lo que siempre he buscado, mi ideal...🤩 ' },
+        'yellow': { class: 'glow-yellow', message: '❤️ Te amo más de lo que te puedas imaginar mi Cami hermosa❤️ ' },
+        'red': { class: 'glow-red', message: '⭐ Desde que llegaste a mi vida, todo tiene más sentido. No se trata solo de lo que haces por mí, sino de cómo me haces sentir: en paz, feliz y completamente yo. Gracias por existir y por enseñarme lo que es el amor de verdad ⭐' },
+        'green': { class: 'glow-green', message: 'Contigo entendí que el amor no se busca, se encuentra… y yo te encontré a ti. Eres mi lugar favorito 💏' },
+        'blue': { class: 'glow-blue', message: 'No sé qué hice para merecerte, pero no pienso dejar de cuidarte nunca. Eres lo mejor que me ha pasado. 💖' }
+      };
+      const glowKeys = Object.keys(glowStyles);
+      const randomGlowKey = glowKeys[Math.floor(Math.random() * glowKeys.length)];
+      const selectedGlow = glowStyles[randomGlowKey];
+
+      // Add glow class to the container
+      imageContainer.classList.add(selectedGlow.class);
+
       // Add "CLICKEAME" text
       const clickMeText = document.createElement('div');
       clickMeText.className = 'click-me-text';
@@ -403,8 +418,7 @@ class InfiniteImageBackground {
       // Add click listener to the image to show the modal
       img.addEventListener('click', (e) => {
         e.stopPropagation();
-        // The shineId is not available anymore, so I'll pass a default value, for example 1
-        this.showModal(img.src, 1);
+        this.showModal(img.src, selectedGlow.message);
       });
     }
 
@@ -517,14 +531,14 @@ class InfiniteImageBackground {
     }
   }
 
-  showModal(imageSrc, shineId) {
+  showModal(imageSrc, message) {
     const modalOverlay = document.getElementById('modal-overlay');
     const modalImage = document.getElementById('modal-image');
     const modalMessage = document.getElementById('modal-message');
     const flipCard = document.getElementById('flip-card');
 
     modalImage.src = imageSrc;
-    modalMessage.textContent = `te amo camila${shineId > 1 ? shineId : ''}`;
+    modalMessage.textContent = message;
     
     modalOverlay.classList.remove('hidden');
     
