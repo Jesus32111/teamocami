@@ -75,6 +75,15 @@ body:active {
   opacity: 0;
 }
 
+.heart {
+  position: absolute;
+  color: #ff0000;
+  text-shadow: 0 0 5px #ff0000, 0 0 10px #ff0000;
+  user-select: none;
+  pointer-events: none;
+  z-index: 2; /* Above the words */
+}
+
 @keyframes heartbeat {
   0%, 100% {
     transform: scale(1);

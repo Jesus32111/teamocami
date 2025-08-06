@@ -242,10 +242,12 @@ class InfiniteTeAmo {
         const wordRect = word.getBoundingClientRect();
         for (const img of imageBackground.images) {
           const imgRect = img.getBoundingClientRect();
+          // console.log("Word rect:", wordRect, "Image rect:", imgRect);
           if (wordRect.left < imgRect.right &&
               wordRect.right > imgRect.left &&
               wordRect.top < imgRect.bottom &&
               wordRect.bottom > imgRect.top) {
+            // console.log("Collision detected!");
             isCollidingWithImage = true;
             break;
           }
@@ -290,6 +292,10 @@ class InfiniteTeAmo {
       if (imageBackgroundInstance) {
         imageBackgroundInstance.updateImages(this.velocityX, this.velocityY);
         imageBackgroundInstance.generateNewImages();
+      }
+
+      if (heartsInstance) {
+        heartsInstance.updateHearts();
       }
       
       requestAnimationFrame(animate);
@@ -491,16 +497,101 @@ class InfiniteImageBackground {
 // Variable global para la instancia
 let teAmoInstance;
 let imageBackgroundInstance;
+let heartsInstance;
+
+class InfiniteHearts {
+  constructor() {
+    this.container = document.getElementById('words-container'); // Reuse the same container
+    this.hearts = [];
+    this.maxHearts = 200;
+    this.init();
+  }
+
+  init() {
+    // No initial hearts needed, they are created on click
+  }
+
+  createHeart(x, y) {
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    heart.textContent = '❤️';
+    
+    const size = Math.random() * 20 + 10;
+    heart.style.fontSize = `${size}px`;
+    
+    heart.style.left = `${x}px`;
+    heart.style.top = `${y}px`;
+    
+    const speed = Math.random() * 2 + 1;
+    const angle = Math.random() * Math.PI * 2;
+    
+    heart.velocityX = Math.cos(angle) * speed;
+    heart.velocityY = Math.sin(angle) * speed;
+    
+    heart.createdAt = Date.now();
+    
+    this.container.appendChild(heart);
+    this.hearts.push(heart);
+    
+    return heart;
+  }
+
+  removeOldestHearts(count) {
+    this.hearts.sort((a, b) => a.createdAt - b.createdAt);
+    
+    for (let i = 0; i < count && this.hearts.length > 0; i++) {
+      const oldHeart = this.hearts.shift();
+      if (oldHeart && oldHeart.parentNode) {
+        oldHeart.remove();
+      }
+    }
+  }
+
+  addHeartsAtPosition(x, y, count) {
+    const heartsToRemove = Math.max(0, (this.hearts.length + count) - this.maxHearts);
+    if (heartsToRemove > 0) {
+      this.removeOldestHearts(heartsToRemove);
+    }
+    
+    for (let i = 0; i < count; i++) {
+      this.createHeart(x + (Math.random() - 0.5) * 50, y + (Math.random() - 0.5) * 50);
+    }
+  }
+
+  updateHearts() {
+    for (let i = this.hearts.length - 1; i >= 0; i--) {
+      const heart = this.hearts[i];
+      
+      let currentX = parseFloat(heart.style.left);
+      let currentY = parseFloat(heart.style.top);
+      
+      currentX += heart.velocityX;
+      currentY += heart.velocityY;
+      
+      // Bounce off the walls
+      if (currentX < 0 || currentX > window.innerWidth) {
+        heart.velocityX *= -1;
+      }
+      if (currentY < 0 || currentY > window.innerHeight) {
+        heart.velocityY *= -1;
+      }
+      
+      heart.style.left = `${currentX}px`;
+      heart.style.top = `${currentY}px`;
+    }
+  }
+}
 
 // Inicializar cuando la página esté cargada
 document.addEventListener('DOMContentLoaded', () => {
   teAmoInstance = new InfiniteTeAmo();
   imageBackgroundInstance = new InfiniteImageBackground();
+  heartsInstance = new InfiniteHearts();
 });
 
 // Agregar palabras al hacer clic con control de límite
 document.addEventListener('click', (e) => {
-  if (teAmoInstance) {
-    teAmoInstance.addWordsAtPosition(e.clientX, e.clientY, 3); // Solo 3 palabras por clic
+  if (heartsInstance) {
+    heartsInstance.addHeartsAtPosition(e.clientX, e.clientY, 5);
   }
 });
